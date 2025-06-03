@@ -34,7 +34,7 @@ def initialize_camera():
     with camera_lock:
         if cap is not None and cap.isOpened():
             cap.release()
-        for index in range(2): 
+        for index in range(0): 
             cap = cv2.VideoCapture(index)
             if cap.isOpened():
                 cap.set(cv2.CAP_PROP_FRAME_WIDTH, 320)
