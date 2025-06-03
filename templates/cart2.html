@@ -1,0 +1,149 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <title>Your Cart</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="../static/style.css">
+    <style>
+        body {
+            font-family: "Poppins", sans-serif;
+            background-image: url(../static/images/bg4.jpg);
+            background-color: rgba(33, 37, 41, 0.8);
+            background-blend-mode: darken;
+            background-repeat: no-repeat;
+            background-size: cover;
+            color: white;
+        }
+        .video-feed {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 200px;
+            height: 200px;
+            border: 2px solid black;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5 d-flex flex-column justify-content-center align-items-center pt-5">
+        <h1 class="text-white text-center mt-5 display-5">Confirm Your Order</h1>
+        <div class="card mt-4 w-50 text-center d-flex flex-column align-items-center justify-content-center py-3" style="background-color: rgba(33, 37, 41, 0.8); border-radius: 30px;">
+            <div class="card-body">
+                <ul class="list-unstyled" id="cart-items">
+                    <!-- Cart items will be populated dynamically -->
+                </ul>
+                <a href="{{ url_for('order') }}" class="btn btn-danger align-items-center" style="font-size: larger;">Place Order 👌</a>
+            </div>
+        </div>
+    </div>
+
+    <img src="{{ url_for('video_feed') }}" class="video-feed" />
+
+    <script>
+        async function updateCart() {
+            const response = await fetch('/get_cart');
+            if (!response.ok) throw new Error('Failed to fetch cart');
+            const data = await response.json();
+            const cartItems = document.getElementById('cart-items');
+            cartItems.innerHTML = '';
+
+            // Handle each item type
+            for (const [item, instances] of Object.entries(data.cart)) {
+                if (instances.length > 0) {
+                    if (item === "Burger") {
+                        // Aggregate unique burger orders with customizations
+                        const burgerCounts = {};
+                        instances.forEach(instance => {
+                            const customStr = instance.customizations.length > 0 
+                                ? ` with ${instance.customizations.join(' and ')}` 
+                                : '';
+                            const key = `${item}${customStr}`;
+                            burgerCounts[key] = (burgerCounts[key] || 0) + 1;
+                        });
+                        for (const [burgerWithCustom, count] of Object.entries(burgerCounts)) {
+                            const li = document.createElement('li');
+                            li.className = 'd-flex justify-content-center align-items-center gap-3 h4';
+                            li.innerHTML = `
+                                <img src="/static/images/${item.toLowerCase()}.jpg" class="image rounded" alt="${item}">
+                                ${burgerWithCustom}: <span>${count}</span>
+                            `;
+                            cartItems.appendChild(li);
+                        }
+                    } else {
+                        // For non-burger items, use the summary count
+                        const count = data.summary[item];
+                        if (count > 0) {
+                            const li = document.createElement('li');
+                            li.className = 'd-flex justify-content-center align-items-center gap-3 h4';
+                            li.innerHTML = `
+                                <img src="/static/images/${item.toLowerCase()}.jpg" class="image rounded" alt="${item}">
+                                ${item}: <span>${count}</span>
+                            `;
+                            cartItems.appendChild(li);
+                        }
+                    }
+                }
+            }
+
+            // Return total items for gesture check
+            return Object.values(data.summary).reduce((a, b) => a + b, 0);
+        }
+
+        async function resetCart() {
+            const response = await fetch('/reset_cart', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            if (!response.ok) throw new Error('Failed to reset cart');
+            await updateCart();
+        }
+
+        async function checkGesture() {
+            const response = await fetch('/check_gesture');
+            if (!response.ok) throw new Error('Failed to fetch gesture');
+            const data = await response.json();
+            if (data.gesture === "ok" && window.location.pathname === '/carts') {
+                const totalItems = await updateCart();
+                if (totalItems > 0) {
+                    Swal.fire({
+                        title: "Success!",
+                        text: "Order Placed Successfully!",
+                        icon: "success",
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
+                    setTimeout(async () => {
+                        await resetCart();
+                        window.location.href = '/order';
+                    }, 1500);
+                } else {
+                    Swal.fire({
+                        title: "Error!",
+                        text: "Cart is Empty!",
+                        icon: "error",
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
+                    setTimeout(() => {
+                        window.location.href = '/order';
+                    }, 1500);
+                }
+            }       
+        }
+
+        if (window.location.pathname === '/carts') {
+            setInterval(updateCart, 1000);
+            setInterval(checkGesture, 1500);
+            window.onload = updateCart;
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js"></script>
+</body>
+</html>

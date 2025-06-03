@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GestureBite - Your Cart</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        :root {
+            --primary-color: #FF6B6B;
+            --secondary-color: #4ECDC4;
+            --dark-color: #2C3E50;
+            --light-color: #F7F9FC;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--light-color);
+            color: var(--dark-color);
+            padding-top: 80px;
+        }
+
+        .navbar {
+            background: rgba(255, 255, 255, 0.95) !important;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+            padding: 1rem 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar-brand {
+            color: #FF6B6B !important;
+            font-weight: 700;
+            font-size: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .navbar-brand .logo-icon {
+            color: #FF6B6B;
+            font-size: 2.2rem;
+        }
+
+        .navbar-brand span {
+            background: linear-gradient(45deg, #FF6B6B, #FF8E8E);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 800;
+        }
+
+        .nav-link {
+            color: var(--dark-color) !important;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            font-size: 1.1rem;
+            padding: 0.5rem 1.2rem !important;
+            position: relative;
+        }
+
+        .nav-link:hover {
+            color: var(--primary-color) !important;
+        }
+
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 1.2rem;
+            right: 1.2rem;
+            height: 3px;
+            background: var(--primary-color);
+            border-radius: 2px;
+        }
+
+        .cart-wrapper {
+            position: relative;
+            padding: 0.5rem 1rem;
+            background: rgba(255, 107, 107, 0.1);
+            border-radius: 50px;
+            margin-left: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .cart-wrapper:hover {
+            background: rgba(255, 107, 107, 0.2);
+        }
+
+        .cart-icon {
+            color: var(--primary-color);
+            font-size: 1.3rem;
+        }
+
+        .cart-count {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            width: 22px;
+            height: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 600;
+            border: 2px solid white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .cart-section {
+            padding: 3rem 0;
+            min-height: 60vh;
+        }
+
+        .cart-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            margin-bottom: 2rem;
+            border: none;
+        }
+
+        .cart-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .cart-card img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+
+        .cart-card .card-body {
+            padding: 1.5rem;
+        }
+
+        .cart-card .card-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--dark-color);
+        }
+
+        .cart-card .card-text {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .btn-order {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 25px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-order:hover {
+            background: #ff5252;
+            transform: scale(1.05);
+        }
+
+        .btn-secondary {
+            background: var(--dark-color);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 25px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: #3b4f66;
+            transform: scale(1.05);
+        }
+
+        .btn-remove {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-remove:hover {
+            background: #c82333;
+            transform: scale(1.05);
+        }
+
+        .video-feed {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 200px;
+            height: 200px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            border: 3px solid var(--primary-color);
+            object-fit: cover;
+        }
+
+        .footer {
+            background: #2C3E50;
+            color: #fff;
+            padding: 4rem 0 2rem;
+            margin-top: 5rem;
+        }
+
+        .footer-logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            display: inline-block;
+            background: linear-gradient(45deg, #FF6B6B, #FF8E8E);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .footer-description {
+            color: #ecf0f1;
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+            max-width: 300px;
+        }
+
+        .footer h5 {
+            color: #FF6B6B;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            font-size: 1.2rem;
+        }
+
+        .footer-links {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .footer-links li {
+            margin-bottom: 0.8rem;
+        }
+
+        .footer-links a {
+            color: #ecf0f1;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .footer-links a:hover {
+            color: #FF6B6B;
+            transform: translateX(5px);
+        }
+
+        .footer-links i {
+            margin-right: 8px;
+            font-size: 0.9rem;
+        }
+
+        .footer-social {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .social-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 107, 107, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #FF6B6B;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .social-icon:hover {
+            background: #FF6B6B;
+            color: white;
+            transform: translateY(-3px);
+        }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(255,255,255,0.1);
+            margin-top: 3rem;
+            padding-top: 2rem;
+            text-align: center;
+            color: #bdc3c7;
+            font-size: 0.9rem;
+        }
+
+        .footer-bottom a {
+            color: #FF6B6B;
+            text-decoration: none;
+        }
+
+        .contact-info {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+            color: #ecf0f1;
+        }
+
+        .contact-info i {
+            width: 30px;
+            color: #FF6B6B;
+        }
+
+        .app-download {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .app-button {
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        .app-button:hover {
+            background: rgba(255,255,255,0.2);
+            color: white;
+        }
+
+        .app-button i {
+            font-size: 1.5rem;
+        }
+
+        .app-button span {
+            font-size: 0.8rem;
+        }
+
+        .app-button strong {
+            display: block;
+            font-size: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .navbar-brand {
+                font-size: 1.6rem;
+            }
+            
+            .navbar-brand .logo-icon {
+                font-size: 1.8rem;
+            }
+
+            .cart-wrapper {
+                margin-left: 0;
+                margin-top: 1rem;
+                display: inline-block;
+            }
+
+            .cart-card img {
+                width: 80px;
+                height: 80px;
+            }
+
+            .cart-card .card-title {
+                font-size: 1.2rem;
+            }
+
+            .cart-section {
+                padding: 2rem 0;
+            }
+
+            .footer {
+                text-align: center;
+            }
+
+            .footer-description {
+                margin: 0 auto 1.5rem;
+            }
+
+            .footer-social {
+                justify-content: center;
+            }
+
+            .contact-info {
+                justify-content: center;
+            }
+
+            .app-download {
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <div class="container">
+            <a class="navbar-brand" href="/order">
+                <i class="fas fa-utensils logo-icon"></i>
+                <span>GestureBite</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/order">Order</a>
+                    </li>
+                   
+                    <li class="nav-item">
+                        <a href="/carts" class="cart-wrapper">
+                            <i class="fas fa-shopping-cart cart-icon"></i>
+                            <span class="cart-count" id="cartCount">0</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Cart Section -->
+    <section class="cart-section">
+        <div class="container">
+            <h1 class="text-center mb-4" style="color: var(--dark-color); font-weight: 700;">Your Cart</h1>
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div id="cart-items">
+                        <!-- Cart items will be populated dynamically -->
+                    </div>
+                    <div class="d-flex justify-content-between mt-4">
+                        <a href="/order" class="btn btn-secondary">Back to Order 🤞</a>
+                        <button class="btn btn-order" onclick="placeOrder()">Place Order 👌</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Video Feed -->
+    <img src="/video_feed" class="video-feed" id="videoFeed" alt="Gesture Video Feed">
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <a href="/order" class="footer-logo">GestureBite</a>
+                    <p class="footer-description">Experience the future of food ordering with gesture-based controls and a delightful menu.</p>
+                    <div class="footer-social">
+                        <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-6 mb-4">
+                    <h5>Quick Links</h5>
+                    <ul class="footer-links">
+                        <li><a href="/order"><i class="fas fa-angle-right"></i> Order</a></li>
+                        <li><a href="/carts"><i class="fas fa-angle-right"></i> Cart</a></li>
+                        <li><a href="#"><i class="fas fa-angle-right"></i> About</a></li>
+                        <li><a href="#"><i class="fas fa-angle-right"></i> Contact</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <h5>Contact Us</h5>
+                    <div class="contact-info">
+                        <i class="fas fa-phone-alt"></i>
+                        <span>+1 234 567 890</span>
+                    </div>
+                    <div class="contact-info">
+                        <i class="fas fa-envelope"></i>
+                        <span>support@gesturebite.com</span>
+                    </div>
+                    <div class="contact-info">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>123 Food St, Flavor City</span>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <h5>Get Our App</h5>
+                    <div class="app-download">
+                        <a href="#" class="app-button">
+                            <i class="fab fa-apple"></i>
+                            <div>
+                                <span>Download on</span>
+                                <strong>App Store</strong>
+                            </div>
+                        </a>
+                        <a href="#" class="app-button">
+                            <i class="fab fa-google-play"></i>
+                            <div>
+                                <span>Get it on</span>
+                                <strong>Google Play</strong>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2025 GestureBite. All rights reserved. <a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a></p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        async function updateCart() {
+            try {
+                const response = await fetch('/get_cart');
+                if (!response.ok) throw new Error('Failed to fetch cart');
+                const data = await response.json();
+                const cartItems = document.getElementById('cart-items');
+                const cartCount = document.getElementById('cartCount');
+                cartItems.innerHTML = '';
+
+                let totalItems = 0;
+                for (const [item, instances] of Object.entries(data.cart)) {
+                    if (instances.length > 0) {
+                        const itemCounts = {};
+                        instances.forEach(instance => {
+                            const customStr = instance.customizations.length > 0 
+                                ? ` with ${instance.customizations.join(' and ')}` 
+                                : '';
+                            const key = `${item}${customStr}`;
+                            itemCounts[key] = (itemCounts[key] || 0) + 1;
+                        });
+                        for (const [itemWithCustom, count] of Object.entries(itemCounts)) {
+                            const card = document.createElement('div');
+                            card.className = 'cart-card';
+                            card.innerHTML = `
+                                <div class="card-body d-flex align-items-center justify-content-between">
+                                    <div class="d-flex align-items-center">
+                                        <img src="/static/images/${item.toLowerCase()}.jpg" alt="${item}">
+                                        <div class="ms-3">
+                                            <h5 class="card-title">${itemWithCustom}</h5>
+                                            <p class="card-text">Quantity: ${count}</p>
+                                        </div>
+                                    </div>
+                                    <button class="btn btn-remove" onclick="removeItem('${item}', '${itemWithCustom}')">Remove</button>
+                                </div>
+                            `;
+                            cartItems.appendChild(card);
+                            totalItems += count;
+                        }
+                    }
+                }
+                cartCount.textContent = totalItems;
+                return totalItems;
+            } catch (error) {
+                console.error('Error updating cart:', error);
+                return 0;
+            }
+        }
+
+        async function removeItem(item, itemWithCustom = '') {
+            try {
+                let customizations = [];
+                if (itemWithCustom.includes('with')) {
+                    customizations = itemWithCustom.split(' with ')[1].split(' and ');
+                }
+                const response = await fetch('/remove_item', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ item, customizations })
+                });
+                const data = await response.json();
+                if (!response.ok || data.status === 'error') {
+                    throw new Error(data.message || 'Failed to remove item');
+                }
+                await updateCart();
+                Swal.fire({
+                    title: "Removed!",
+                    text: `${item} removed from cart.`,
+                    icon: "success",
+                    timer: 1500,
+                    showConfirmButton: false
+                });
+            } catch (error) {
+                console.error('Error removing item:', error);
+                Swal.fire({
+                    title: "Error!",
+                    text: error.message || "Failed to remove item.",
+                    icon: "error",
+                    timer: 1500,
+                    showConfirmButton: false
+                });
+            }
+        }
+
+        async function placeOrder() {
+            const totalItems = await updateCart();
+            if (totalItems > 0) {
+                Swal.fire({
+                    title: "Success!",
+                    text: "Order Placed Successfully!",
+                    icon: "success",
+                    timer: 1500,
+                    showConfirmButton: false
+                });
+                setTimeout(async () => {
+                    await resetCart();
+                    window.location.href = '/order';
+                }, 1500);
+            } else {
+                Swal.fire({
+                    title: "Error!",
+                    text: "Cart is Empty!",
+                    icon: "error",
+                    timer: 1500,
+                    showConfirmButton: false
+                });
+            }
+        }
+
+        async function resetCart() {
+            try {
+                const response = await fetch('/reset_cart', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                if (!response.ok) throw new Error('Failed to reset cart');
+                await updateCart();
+            } catch (error) {
+                console.error('Error resetting cart:', error);
+            }
+        }
+
+        async function checkGesture() {
+            try {
+                const response = await fetch('/check_gesture');
+                if (!response.ok) throw new Error('Failed to fetch gesture');
+                const data = await response.json();
+                if (window.location.pathname === '/carts') {
+                    switch (data.gesture) {
+                        case 'ok':
+                            await placeOrder();
+                            break;
+                        case 'thumbs_up':
+                            await removeItem('Burger');
+                            break;
+                        case 'pointing_up':
+                            await removeItem('Pizza');
+                            break;
+                        case 'peace_sign':
+                            await removeItem('Pasta');
+                            break;
+                        case 'three_fingers_up':
+                            await removeItem('CocaCola');
+                            break;
+                        case 'first_and_last_fingers_up':
+                            await removeItem('FrenchFries');
+                            break;
+                        case 'open_hand':
+                            await removeItem('Thepla');
+                            break;
+                        case 'cross_fingers':
+                            Swal.fire({
+                                title: "Navigating!",
+                                text: "Returning to order page.",
+                                icon: "info",
+                                timer: 1000,
+                                showConfirmButton: false
+                            });
+                            setTimeout(() => {
+                                window.location.href = '/order';
+                            }, 1000);
+                            break;
+                    }
+                }
+            } catch (error) {
+                console.error('Error checking gesture:', error);
+            }
+        }
+
+        if (window.location.pathname === '/carts') {
+            setInterval(updateCart, 1000);
+            setInterval(checkGesture, 1500);
+            window.onload = updateCart;
+
+            const videoFeed = document.getElementById('videoFeed');
+            videoFeed.onerror = () => console.error('Video feed failed to load');
+            videoFeed.onload = () => console.log('Video feed loaded');
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+</body>
+</html>

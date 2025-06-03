@@ -1,0 +1,65 @@
+/* General Styles */
+body {
+    
+    font-family: 'Arial', sans-serif;
+}
+
+h1, h3 {
+    color: #333;
+}
+
+.card-title {
+    font-size: 1.2rem;
+}
+
+/* .card-body {
+    padding: 20px;
+} */
+
+/* Navbar Styling */
+.navbar {
+    margin-bottom: 30px;
+}
+
+/* Food Item Cards */
+.card {
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.card-img-top {
+    border-radius: 10px;
+}
+
+/* Order Page */
+.list-group-item {
+    margin-bottom: 10px;
+    border-radius: 8px;
+}
+
+.badge {
+    font-size: 1.2rem;
+}
+
+/* Button Styling */
+button {
+    width: 100%;
+    padding: 10px;
+    font-size: 1.1rem;
+}
+img{
+    height: 260px;
+   
+}
+
+.image {
+    height: 50px;
+    width: 50px;
+    margin: 5px;
+    object-fit: cover;
+  }
+
+  .icons{
+    height: 41.24px;
+  }
