@@ -489,10 +489,7 @@ def is_cross_fingers(hand_landmarks):
 
 if __name__ == '__main__':
     try:
-        # app.run(debug=True, use_reloader=False, port=5005)
-         
-        port = int(os.environ.get("PORT", 5005))
-        app.run(host='0.0.0.0', port=5005)
+        app.run(debug=True, use_reloader=False, port=5005 , host='0.0.0.0' )
     finally:
         with camera_lock:
             if cap is not None and cap.isOpened():
